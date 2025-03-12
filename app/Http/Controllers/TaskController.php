@@ -7,16 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
-class TaskController extends Controller
-{
-    public function index(): JsonResponse
-    {
+class TaskController extends Controller {
+    public function __construct() {
+        // Fix: Use middleware through the route instead of in the controller
+    }
+
+    public function index(): JsonResponse {
         $tasks = Task::orderBy('created_at', 'desc')->get();
         return response()->json($tasks);
     }
 
-    public function store(Request $request): JsonResponse
-    {
+    public function store(Request $request): JsonResponse {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -32,13 +33,11 @@ class TaskController extends Controller
         return response()->json($task, 201);
     }
 
-    public function show(Task $task): JsonResponse
-    {
+    public function show(Task $task): JsonResponse {
         return response()->json($task);
     }
 
-    public function update(Request $request, Task $task): JsonResponse
-    {
+    public function update(Request $request, Task $task): JsonResponse {
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
             'description' => 'string',
@@ -54,8 +53,7 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
-    public function destroy(Task $task): JsonResponse
-    {
+    public function destroy(Task $task): JsonResponse {
         $task->delete();
         return response()->json(null, 204);
     }
