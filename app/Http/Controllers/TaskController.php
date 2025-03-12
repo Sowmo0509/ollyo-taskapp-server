@@ -5,16 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller {
     public function __construct() {
         // Fix: Use middleware through the route instead of in the controller
-    }
-
-    public function index(): JsonResponse {
-        $tasks = Task::orderBy('created_at', 'desc')->get();
-        return response()->json($tasks);
     }
 
     public function store(Request $request): JsonResponse {
@@ -29,8 +25,16 @@ class TaskController extends Controller {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $task = Task::create($request->all());
-        return response()->json($task, 201);
+        $task = new Task($request->all());
+        $task->user_id = Auth::id(); // Associate the task with the authenticated user
+        $task->save();
+
+        return response()->json($task->load('user'), 201);
+    }
+
+    public function index(): JsonResponse {
+        $tasks = Task::with('user')->orderBy('created_at', 'desc')->get();
+        return response()->json($tasks);
     }
 
     public function show(Task $task): JsonResponse {
