@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Apply the sanctum middleware to the tasks routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/tasks/global-search', [TaskController::class, 'globalSearch']);
+    Route::get('/tasks/search', [TaskController::class, 'search']);
     Route::apiResource('tasks', TaskController::class);
 });
 

@@ -61,4 +61,18 @@ class TaskController extends Controller {
         $task->delete();
         return response()->json(null, 204);
     }
+
+    public function globalSearch(Request $request): JsonResponse {
+        $query = $request->get('q');
+    
+        $tasks = Task::with('user')
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return response()->json($tasks);
+    }
 }
