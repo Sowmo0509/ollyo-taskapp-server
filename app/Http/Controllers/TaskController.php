@@ -26,14 +26,40 @@ class TaskController extends Controller {
         }
 
         $task = new Task($request->all());
-        $task->user_id = Auth::id(); // Associate the task with the authenticated user
+        $task->user_id = Auth::id();
         $task->save();
 
         return response()->json($task->load('user'), 201);
     }
 
-    public function index(): JsonResponse {
-        $tasks = Task::with('user')->orderBy('created_at', 'desc')->get();
+    public function index(Request $request): JsonResponse {
+        $sortDirection = $request->query('sort', 'asc');
+        $status = $request->query('status');
+
+        $query = Task::with('user'); // Add user relationship and remove user_id filter
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $tasks = $query->orderBy('due_date', $sortDirection)->get();
+        return response()->json($tasks);
+    }
+
+    public function search(Request $request): JsonResponse {
+        $query = $request->get('q');
+        $status = $request->get('status');
+        $sortDirection = $request->query('sort', 'asc');
+
+        $tasks = Task::with('user') // Add user relationship and remove user_id filter
+            ->where('status', $status)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%");
+            })
+            ->orderBy('due_date', $sortDirection)
+            ->get();
+
         return response()->json($tasks);
     }
 
@@ -64,15 +90,15 @@ class TaskController extends Controller {
 
     public function globalSearch(Request $request): JsonResponse {
         $query = $request->get('q');
-    
+
         $tasks = Task::with('user')
-            ->where(function($q) use ($query) {
+            ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%");
+                    ->orWhere('description', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
             ->get();
-    
+
         return response()->json($tasks);
     }
 }
