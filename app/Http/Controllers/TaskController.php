@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller {
     public function __construct() {
-        // Fix: Use middleware through the route instead of in the controller
     }
 
     public function store(Request $request): JsonResponse {
@@ -36,7 +35,7 @@ class TaskController extends Controller {
         $sortDirection = $request->query('sort', 'asc');
         $status = $request->query('status');
 
-        $query = Task::with('user'); // Add user relationship and remove user_id filter
+        $query = Task::with('user');
 
         if ($status) {
             $query->where('status', $status);
@@ -51,7 +50,7 @@ class TaskController extends Controller {
         $status = $request->get('status');
         $sortDirection = $request->query('sort', 'asc');
 
-        $tasks = Task::with('user') // Add user relationship and remove user_id filter
+        $tasks = Task::with('user')
             ->where('status', $status)
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
