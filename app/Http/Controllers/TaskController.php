@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PostCreated;
+use App\Events\TaskCreated;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,7 @@ class TaskController extends Controller {
         $task = new Task($request->all());
         $task->user_id = Auth::id();
         $task->save();
-        event(new PostCreated("hola"));
+        event(new TaskCreated("hola"));
 
         return response()->json($task->load('user'), 201);
     }

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostCreated implements ShouldBroadcastNow {
+class TaskCreated implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
@@ -24,9 +24,9 @@ class PostCreated implements ShouldBroadcastNow {
     }
 
     public function broadcastOn() {
-        return ['my-channel']; // important part of realtime notification
+        return ['tasks']; // important part of realtime notification
     }
     public function broadcastAs() {
-        return 'my-event'; // important part of realtime notification
+        return 'task.created'; // important part of realtime notification
     }
 }
