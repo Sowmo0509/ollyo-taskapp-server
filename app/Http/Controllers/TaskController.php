@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Events\PostCreated;
 use App\Events\TaskCreated;
+use App\Events\TaskDeleted;
+use App\Events\TaskUpdated;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -82,12 +84,17 @@ class TaskController extends Controller {
         }
 
         $task->update($request->all());
+        event(new TaskUpdated($task));
         return response()->json($task);
     }
 
-    public function destroy(Task $task): JsonResponse {
+    public function destroy($id) {
+        $task = Task::findOrFail($id);
         $task->delete();
-        return response()->json(null, 204);
+
+        event(new TaskDeleted($id));
+
+        return response()->json(['message' => 'Task deleted successfully']);
     }
 
     public function globalSearch(Request $request): JsonResponse {
