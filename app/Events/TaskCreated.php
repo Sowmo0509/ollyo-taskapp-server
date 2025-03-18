@@ -24,9 +24,9 @@ class TaskCreated implements ShouldBroadcastNow {
     }
 
     public function broadcastOn() {
-        return ['tasks']; // important part of realtime notification
+        return ['tasks'];
     }
     public function broadcastAs() {
-        return 'task.created'; // important part of realtime notification
+        return 'task.created';
     }
 }

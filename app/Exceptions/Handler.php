@@ -6,8 +6,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
-class Handler extends ExceptionHandler
-{
+class Handler extends ExceptionHandler {
     /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
@@ -22,8 +21,7 @@ class Handler extends ExceptionHandler
     /**
      * Register the exception handling callbacks for the application.
      */
-    public function register(): void
-    {
+    public function register(): void {
         $this->reportable(function (Throwable $e) {
             //
         });
@@ -32,14 +30,11 @@ class Handler extends ExceptionHandler
     /**
      * Convert an authentication exception into a response.
      */
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
-        // Always return JSON response for API routes
+    protected function unauthenticated($request, AuthenticationException $exception) {
         if ($request->is('api/*')) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
-        
-        // For web routes, try to redirect to login if it exists
+
         return $request->expectsJson()
             ? response()->json(['message' => 'Unauthenticated.'], 401)
             : redirect()->guest($request->expectsJson() ? null : '/login');
